@@ -1,0 +1,184 @@
+<html>
+<style>
+html
+{
+	width:500px;
+	font-family: 'Droid Sans', arial, serif;
+}
+
+div.header
+{
+	margin-top:10px;
+	color:#666;
+	text-align:left;
+}
+
+div.hr 
+{ 
+	width: 100%;
+	height: 1px; 
+	background: #666; 
+}
+
+div.tab
+{
+	width: 100%;
+	color:#999;
+	text-align:left;
+	margin-top:5px;
+	cursor:pointer;
+}
+
+div.tab:Hover
+{
+	width: 100%;
+	background-color:#69F;
+	color:#FFF;
+	text-align:left;
+	margin-top:5px;
+	cursor:pointer;
+}
+
+div.message
+{
+	width: 100%;
+	color:#999;
+	text-align:left;
+	font-style:italic;
+	margin-top:5px;
+}
+</style>
+<script>
+var backgroundPage = chrome.extension.getBackgroundPage();
+
+//Displays the opened and closed tabs to the user
+function display()
+{
+	var container = document.createElement("div");
+	container.id = "container";
+	
+	var openTabHeader = document.createElement("div");
+	openTabHeader.id = "openTabsHeader";
+	openTabHeader.className = "header";
+	openTabHeader.innerHTML = "Open tabs";
+	
+	container.appendChild(openTabHeader);
+	
+	var openTabRuler = document.createElement("div");
+	openTabRuler.id = "openTabRuler";
+	openTabRuler.className = "hr";
+	
+	container.appendChild(openTabRuler);
+	
+	if(backgroundPage.openTabs.length > 0)
+	{
+		for (var i = 0; i < backgroundPage.openTabs.length; i++)
+		{
+			var openTab = document.createElement("div");
+			openTab.id = backgroundPage.openTabs[i].tab.id;
+			openTab.className = "tab";
+			openTab.onclick = openTabClicked;
+			openTab.innerHTML = backgroundPage.openTabs[i].tab.title;
+			
+			container.appendChild(openTab);
+		}
+	}
+	else
+	{
+		var noOpenTabsMessage = document.createElement("div");
+		noOpenTabsMessage.id = "closedTabsHeader";
+		noOpenTabsMessage.className = "message";
+		noOpenTabsMessage.innerHTML = "There are no opens tabs. Impossible!";
+		
+		container.appendChild(noOpenTabsMessage);
+	}
+	
+	var closedTabHeader = document.createElement("div");
+	closedTabHeader.id = "closedTabsHeader";
+	closedTabHeader.className = "header";
+	closedTabHeader.innerHTML = "Assassinated tabs";
+	container.appendChild(closedTabHeader);
+	
+	var closedTabRuler = document.createElement("div");
+	closedTabRuler.id = "closedTabRuler";
+	closedTabRuler.className = "hr";
+	
+	container.appendChild(closedTabRuler);
+	
+	if(backgroundPage.closedTabs.length > 0)
+	{
+		for (var i = 0; i < backgroundPage.closedTabs.length; i++)
+		{
+			var closedTab = document.createElement("div");
+			closedTab.id = backgroundPage.closedTabs[i].tab.id;
+			closedTab.className = "tab";
+			closedTab.onclick = closedTabClicked;
+			closedTab.innerHTML = backgroundPage.closedTabs[i].tab.title;
+			
+			container.appendChild(closedTab);
+		}
+	}
+	else
+	{
+		var noClosedTabsMessage = document.createElement("div");
+		noClosedTabsMessage.id = "closedTabsHeader";
+		noClosedTabsMessage.className = "message";
+		noClosedTabsMessage.innerHTML = "There are no closed tabs.";
+		
+		container.appendChild(noClosedTabsMessage);
+	}
+	
+	document.body.appendChild(container);
+}
+
+//Calls a function on the background page to focus on an open tab
+function openTabClicked()
+{
+	backgroundPage.selectTab(parseInt(this.id));
+}
+
+//Calls a function on the background page to reopen a closed tab
+function closedTabClicked()
+{
+	backgroundPage.reopenTab(parseInt(this.id));
+}
+
+//Removes a tab from the UI
+function removeTab(tabId)
+{
+	var container = document.getElementById("container");
+	var tabDiv = document.getElementById(tabId);
+	container.removeChild(tabDiv);
+	
+	if (backgroundPage.closedTabs.length == 0)
+	{
+		var noClosedTabsMessage = document.createElement("div");
+		noClosedTabsMessage.id = "closedTabsHeader";
+		noClosedTabsMessage.className = "message";
+		noClosedTabsMessage.innerHTML = "There are no closed tabs.";
+		
+		container.appendChild(noClosedTabsMessage);
+	}
+}
+
+//Adds a tab to the UI
+function addedTab(tab)
+{
+	var container = document.getElementById("container");
+	var closedTabHeader = document.getElementById("closedTabsHeader");
+	
+	var openTab = document.createElement("div");
+	openTab.id = tab.id;
+	openTab.className = "tab";
+	openTab.onclick = openTabClicked;
+	openTab.innerHTML = tab.title;
+	
+	container.insertBefore(openTab, closedTabHeader);
+}
+</script>
+<head>
+<link href='http://fonts.googleapis.com/css?family=Droid+Sans' rel='stylesheet' type='text/css'>
+</head>
+<body onLoad="display()">
+</body>
+</html>
