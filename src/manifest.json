@@ -1,0 +1,15 @@
+{
+  "name": "Tab Assassin",
+  "version": "0.1",
+  "description": "Manage the number of tabs you have open in Chrome.  Tab Assassin automatically closes, but keeps a record of tabs you are not using.",
+  "background_page": "background.html",
+  "options_page": "options.html",
+  "browser_action": {
+    "default_icon": "images/DelTabsIcon.png",
+    "popup" : "TabAssassin.html"
+  },
+  "permissions": [
+    "tabs",
+    "background"
+  ]
+}
