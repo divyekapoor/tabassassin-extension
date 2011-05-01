@@ -36,6 +36,7 @@ chrome.tabs.onUpdated.addListener(function(tabId, changeInfo, tab)
 	{
 		if (openTabs[i].tab.id == tabId)
 		{
+			openTabs[i].tab.title = tab.title;
 			openTabs[i].tab.url = tab.url;
 			openTabs[i].tab.pinned = tab.pinned;
 			openTabs[i].tab.status = tab.status;
@@ -175,7 +176,10 @@ function reopenTab(tabId)
 	}
 }
 
-//An object containing the tab and its position in an array
+// An object containing the tab and its age.  FIXME: the rest of the
+// code treats the tab object as if it were its own, which
+// fortunately seems to be true (it appears to be ephemeral from
+// Chrome's POV) but is perhaps not to be relied on?
 function tabInfo(tab, count)
 {
 	this.tab = tab;
