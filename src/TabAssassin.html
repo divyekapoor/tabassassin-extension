@@ -51,7 +51,7 @@ div.message
 <script>
 var backgroundPage = chrome.extension.getBackgroundPage();
 
-//Displays the opened and closed tabs to the user
+// Displays the opened and closed tabs to the user
 function display()
 {
 	var container = document.createElement("div");
@@ -78,8 +78,9 @@ function display()
 			openTab.id = backgroundPage.openTabs[i].tab.id;
 			openTab.className = "tab";
 			openTab.onclick = openTabClicked;
-			openTab.innerHTML = backgroundPage.openTabs[i].tab.title;
-			
+			var tab = backgroundPage.openTabs[i];
+			openTab.innerHTML = tab.tab.title + " [" + tab.count + "]";
+
 			container.appendChild(openTab);
 		}
 	}
