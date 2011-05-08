@@ -75,10 +75,14 @@ function display()
 		for (var i = 0; i < backgroundPage.openTabs.length; i++)
 		{
 			var openTab = document.createElement("div");
-			openTab.id = backgroundPage.openTabs[i].tab.id;
+			var tab = backgroundPage.openTabs[i];
+			// Selected tabs don't get their count set to 0 until they
+			// are deselected, so fake it here.
+			if (tab.tab.selected)
+				tab.count = 0;
+			openTab.id = tab.tab.id;
 			openTab.className = "tab";
 			openTab.onclick = openTabClicked;
-			var tab = backgroundPage.openTabs[i];
 			openTab.innerHTML = tab.tab.title + " [" + tab.count + "]";
 
 			container.appendChild(openTab);
