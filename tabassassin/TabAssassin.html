@@ -108,14 +108,15 @@ function display()
 			
 			var openTabStatus = document.createElement("div");
 			openTabStatus.className = "tabStatus";
-      if (backgroundPage.openTabs[i].tab.selected == true)
+      openTabStatus.innerHTML = "[Inactive for " + backgroundPage.openTabs[i].count + " minutes]";
+        /*if (backgroundPage.openTabs[i].tab.selected == true)
       {
            openTabStatus.innerHTML = "[Inactive for 0 minutes]";
       }
       else
       {
            openTabStatus.innerHTML = "[Inactive for " + backgroundPage.openTabs[i].count + " minutes]";
-      }
+      }*/
 			
 			container.appendChild(openTabStatus);
 		}
