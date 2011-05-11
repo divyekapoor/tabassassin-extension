@@ -2,54 +2,78 @@
 <style>
 html
 {
-	width:500px;
 	font-family: 'Droid Sans', arial, serif;
+	width:500px;
 }
 
 div.header
 {
+	color:#333;
 	margin-top:10px;
-	color:#666;
 	text-align:left;
 }
 
 div.hr 
 { 
+	background: #666;
+	height: 1px;  
 	width: 100%;
-	height: 1px; 
-	background: #666; 
 }
 
 div.tab
 {
-	width: 100%;
-	color:#999;
-	text-align:left;
-	margin-top:5px;
+	color:#666;
 	cursor:pointer;
+	margin-top:5px;
+	text-align:left;
+	width: 100%;
 }
 
 div.tab:Hover
 {
-	width: 100%;
 	background-color:#69F;
 	color:#FFF;
+}
+div.tabStatus
+{
+	color:#CCC;
+	font-size:xx-small;
 	text-align:left;
-	margin-top:5px;
-	cursor:pointer;
+	width: 100%;
 }
 
 div.message
 {
-	width: 100%;
 	color:#999;
-	text-align:left;
 	font-style:italic;
 	margin-top:5px;
+	text-align:left;
+	width: 100%;
 }
 </style>
 <script>
 var backgroundPage = chrome.extension.getBackgroundPage();
+
+//Adds a tab to the UI
+function addedTab(tab)
+{
+	var container = document.getElementById("container");
+	var closedTabHeader = document.getElementById("closedTabsHeader");
+	
+	var openTab = document.createElement("div");
+	openTab.id = tab.id;
+	openTab.className = "tab";
+	openTab.onclick = openTabClicked;
+	openTab.innerHTML = tab.title;
+	
+	container.insertBefore(openTab, closedTabHeader);
+}
+
+//Calls a function on the background page to reopen a closed tab
+function closedTabClicked()
+{
+	backgroundPage.reopenTab(parseInt(this.id));
+}
 
 // Displays the opened and closed tabs to the user
 function display()
@@ -75,17 +99,18 @@ function display()
 		for (var i = 0; i < backgroundPage.openTabs.length; i++)
 		{
 			var openTab = document.createElement("div");
-			var tab = backgroundPage.openTabs[i];
-			// Selected tabs don't get their count set to 0 until they
-			// are deselected, so fake it here.
-			if (tab.tab.selected)
-				tab.count = 0;
-			openTab.id = tab.tab.id;
+			openTab.id = backgroundPage.openTabs[i].tab.id;
 			openTab.className = "tab";
 			openTab.onclick = openTabClicked;
-			openTab.innerHTML = tab.tab.title + " [" + tab.count + "]";
+			openTab.innerHTML = backgroundPage.openTabs[i].tab.title;
 
 			container.appendChild(openTab);
+			
+			var openTabStatus = document.createElement("div");
+			openTabStatus.className = "tabStatus";
+			openTabStatus.innerHTML = "[Inactive for " + backgroundPage.openTabs[i].count + " minutes]"
+			
+			container.appendChild(openTabStatus);
 		}
 	}
 	else
@@ -121,6 +146,12 @@ function display()
 			closedTab.innerHTML = backgroundPage.closedTabs[i].tab.title;
 			
 			container.appendChild(closedTab);
+			
+			var closedTabStatus = document.createElement("div");
+			closedTabStatus.className = "tabStatus";
+			closedTabStatus.innerHTML = "[Closed for " + backgroundPage.closedTabs[i].count + " minutes]"
+			
+			container.appendChild(closedTabStatus);
 		}
 	}
 	else
@@ -142,12 +173,6 @@ function openTabClicked()
 	backgroundPage.selectTab(parseInt(this.id));
 }
 
-//Calls a function on the background page to reopen a closed tab
-function closedTabClicked()
-{
-	backgroundPage.reopenTab(parseInt(this.id));
-}
-
 //Removes a tab from the UI
 function removeTab(tabId)
 {
@@ -164,21 +189,6 @@ function removeTab(tabId)
 		
 		container.appendChild(noClosedTabsMessage);
 	}
-}
-
-//Adds a tab to the UI
-function addedTab(tab)
-{
-	var container = document.getElementById("container");
-	var closedTabHeader = document.getElementById("closedTabsHeader");
-	
-	var openTab = document.createElement("div");
-	openTab.id = tab.id;
-	openTab.className = "tab";
-	openTab.onclick = openTabClicked;
-	openTab.innerHTML = tab.title;
-	
-	container.insertBefore(openTab, closedTabHeader);
 }
 </script>
 <head>
