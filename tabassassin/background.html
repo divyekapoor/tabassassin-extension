@@ -105,41 +105,41 @@ chrome.tabs.onRemoved.addListener(function(tabId, removeInfo)
 //A timed event that checks to see if any tabs have been "inactive".  Inactive tabs are closed, removed from an array of open tabs and added to an array of closed tabs
 function timerEvent()
 {	
-	for (var i = 0; i < openTabs.length; i++)
-	{	
-		if (openTabs[i].count >= inactiveThreshold)
-		{
-			if (openTabs[i].tab.selected != true && openTabs[i].tab.pinned != true)
-			{
-				closedTabs.push(new tabInfo(openTabs[i].tab, 0));
-				chrome.tabs.remove(openTabs[i].tab.id);
-			}
-		}
-		
-		if (chromeUsed == true)
-		{
-			openTabs[i].count++;
-		}
-	}
-	
-	for (var i = 0; i < closedTabs.length; i++)
-	{	
-		if (closedTabs[i].count >= storeClosedTabsThreshold)
-		{
-			closedTabs.splice(i, 1);
-		}
-		
-		if (chromeUsed == true)
-		{
-			closedTabs[i].count++;
-		}
-	}
-	
 	if (chromeUsed == true)
 	{
+		for (var i = 0; i < openTabs.length; i++)
+		{		
+			if (openTabs[i].count >= inactiveThreshold)
+			{
+				if (openTabs[i].tab.selected != true && openTabs[i].tab.pinned != true)
+				{
+					closedTabs.push(new tabInfo(openTabs[i].tab, 0));
+					chrome.tabs.remove(openTabs[i].tab.id);
+				}
+			}
+			
+			if (openTabs[i].tab.selected != true)
+			{
+				openTabs[i].count++;
+			}
+			else
+			{
+				openTabs[i].count = 0;
+			}
+		}
+	
+		for (var i = 0; i < closedTabs.length; i++)
+		{	
+			if (closedTabs[i].count >= storeClosedTabsThreshold)
+			{
+				closedTabs.splice(i, 1);
+			}
+		
+			closedTabs[i].count++;
+		}
+	
 		chromeUsed = false;
 	}
-	
 	setTimeout("timerEvent()", checkInternal);
 }
 
