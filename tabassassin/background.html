@@ -12,169 +12,169 @@ var chromeUsed = false;
 //When a tab is opened by the user, that tab is added to an array of open tabs
 chrome.tabs.onCreated.addListener(function(tab) 
 {
-	chromeUsed = true;
+  chromeUsed = true;
 	
-	openTabs.push(new tabInfo(tab, 0));
+  openTabs.push(new tabInfo(tab, 0));
 	
-	var viewTabUrl = chrome.extension.getURL("TabAssassin.html");
-	var views = chrome.extension.getViews();
-	for (var j = 0; j < views.length; j++)
-	{
-		if (views[j].location.href == viewTabUrl)
-		{
-			views[j].addedTab(tab);
-			break;
-		}
-	}
+  var viewTabUrl = chrome.extension.getURL("TabAssassin.html");
+  var views = chrome.extension.getViews();
+  for (var j = 0; j < views.length; j++)
+  {
+    if (views[j].location.href == viewTabUrl)
+    {
+      views[j].addedTab(tab);
+      break;
+    }
+  }
 });
 
 chrome.tabs.onUpdated.addListener(function(tabId, changeInfo, tab)
 {	
-	chromeUsed = true;
+  chromeUsed = true;
 	
-	for (var i = 0; i < openTabs.length; i++)
-	{
-		if (openTabs[i].tab.id == tabId)
-		{
-			openTabs[i].tab.title = tab.title;
-			openTabs[i].tab.url = tab.url;
-			openTabs[i].tab.pinned = tab.pinned;
-			openTabs[i].tab.status = tab.status;
+  for (var i = 0; i < openTabs.length; i++)
+  {
+    if (openTabs[i].tab.id == tabId)
+    {
+      openTabs[i].tab.title = tab.title;
+      openTabs[i].tab.url = tab.url;
+      openTabs[i].tab.pinned = tab.pinned;
+      openTabs[i].tab.status = tab.status;
 			
-			openTabs[i].count = 0;
-		}
-	}
+      openTabs[i].count = 0;
+    }
+  }
 });
 
 //When a tab is selected it is updated as selected and the previous selected tab is updated as not selected
 chrome.tabs.onSelectionChanged.addListener(function(tabId, selectInfo)
 {
-	chromeUsed = true;
+  chromeUsed = true;
 	
-	for (var i = 0; i < openTabs.length; i++)
-	{
-		if (openTabs[i].tab.id == tabId)
-		{
-			openTabs[i].tab.selected = true;
+  for (var i = 0; i < openTabs.length; i++)
+  {
+    if (openTabs[i].tab.id == tabId)
+    {
+      openTabs[i].tab.selected = true;
       openTabs[i].count = 0;
-		}
-		else
-		{
-			if (openTabs[i].tab.selected == true)
-			{
-				openTabs[i].tab.selected = false;
-				openTabs[i].count = 0;
-			}
-			else
-			{
-				openTabs[i].tab.selected = false;
-			}
-		}
-	}
+    }
+    else
+    {
+      if (openTabs[i].tab.selected == true)
+      {
+	openTabs[i].tab.selected = false;
+	openTabs[i].count = 0;
+      }
+      else
+      {
+	openTabs[i].tab.selected = false;
+      }
+    }
+  }
 });
 
 /*chrome.tabs.onMoved.addListener(function(tabId, moveInfo) 
 {
-	//Do nothing.  We don't care about moved tabs... do we?
+//Do nothing.  We don't care about moved tabs... do we?
 });*/
 
 chrome.tabs.onAttached.addListener(function(tabId, attachInfo)
 {
-	//Do nothing.  We don't care about atteched tabs... do we?
+  //Do nothing.  We don't care about atteched tabs... do we?
 });
 
 chrome.tabs.onDetached.addListener(function(tabId, detachInfo) 
 {
-	//Do nothing.  We don't care about detached tabs... do we?
+  //Do nothing.  We don't care about detached tabs... do we?
 });
 
 //When a tab is removed by the user, that tab is removed from an array of open tabs
 chrome.tabs.onRemoved.addListener(function(tabId, removeInfo) 
 {
-	chromeUsed = true;
+  chromeUsed = true;
 	
-	for (var i = 0; i < openTabs.length; i++)
-	{
-		if (openTabs[i].tab.id == tabId)
-		{
-			openTabs.splice(i, 1);
-			break;
-		}
-	}
+  for (var i = 0; i < openTabs.length; i++)
+  {
+    if (openTabs[i].tab.id == tabId)
+    {
+      openTabs.splice(i, 1);
+      break;
+    }
+  }
 });
 
 //A timed event that checks to see if any tabs have been "inactive".  Inactive tabs are closed, removed from an array of open tabs and added to an array of closed tabs
 function timerEvent()
 {	
-	if (chromeUsed == true)
+  if (chromeUsed == true)
+  {
+    for (var i = 0; i < openTabs.length; i++)
+    {		
+      if (openTabs[i].count >= inactiveThreshold)
+      {
+	if (openTabs[i].tab.selected != true && openTabs[i].tab.pinned != true)
 	{
-		for (var i = 0; i < openTabs.length; i++)
-		{		
-			if (openTabs[i].count >= inactiveThreshold)
-			{
-				if (openTabs[i].tab.selected != true && openTabs[i].tab.pinned != true)
-				{
-					closedTabs.push(new tabInfo(openTabs[i].tab, 0));
-					chrome.tabs.remove(openTabs[i].tab.id);
-				}
-			}
-			
-			if (openTabs[i].tab.selected != true)
-			{
-				openTabs[i].count++;
-			}
-			else
-			{
-				openTabs[i].count = 0;
-			}
-		}
-	
-		for (var i = 0; i < closedTabs.length; i++)
-		{	
-			if (closedTabs[i].count >= storeClosedTabsThreshold)
-			{
-				closedTabs.splice(i, 1);
-			}
-		
-			closedTabs[i].count++;
-		}
-	
-		chromeUsed = false;
+	  closedTabs.push(new tabInfo(openTabs[i].tab, 0));
+	  chrome.tabs.remove(openTabs[i].tab.id);
 	}
-	setTimeout("timerEvent()", checkInternal);
+      }
+			
+      if (openTabs[i].tab.selected != true)
+      {
+	openTabs[i].count++;
+      }
+      else
+      {
+	openTabs[i].count = 0;
+      }
+    }
+	
+    for (var i = 0; i < closedTabs.length; i++)
+    {	
+      if (closedTabs[i].count >= storeClosedTabsThreshold)
+      {
+	closedTabs.splice(i, 1);
+      }
+		
+      closedTabs[i].count++;
+    }
+	
+    chromeUsed = false;
+  }
+  setTimeout("timerEvent()", checkInternal);
 }
 
 //Focuses on a open tab selected from the Tab Assassin UI
 function selectTab(tabId)
 {
-	chrome.tabs.update(tabId, {selected : true});
+  chrome.tabs.update(tabId, {selected : true});
 }
 
 //Reopens an assassinated tab selected from the Tab Assassin UI
 function reopenTab(tabId)
 {
-	for (var i = 0; i < closedTabs.length; i++)
+  for (var i = 0; i < closedTabs.length; i++)
+  {
+    if (closedTabs[i].tab.id == tabId)
+    {
+      chrome.tabs.create({url : closedTabs[i].tab.url});
+			
+      closedTabs.splice(i, 1);
+			
+      var viewTabUrl = chrome.extension.getURL("TabAssassin.html");
+      var views = chrome.extension.getViews();
+      for (var j = 0; j < views.length; j++)
+      {
+	if (views[j].location.href == viewTabUrl)
 	{
-		if (closedTabs[i].tab.id == tabId)
-		{
-			chrome.tabs.create({url : closedTabs[i].tab.url});
-			
-			closedTabs.splice(i, 1);
-			
-			var viewTabUrl = chrome.extension.getURL("TabAssassin.html");
-			var views = chrome.extension.getViews();
-			for (var j = 0; j < views.length; j++)
-			{
-				if (views[j].location.href == viewTabUrl)
-				{
-					views[j].removeTab(tabId);
-					break;
-				}
-			}
-			
-			break;
-		}
+	  views[j].removeTab(tabId);
+	  break;
 	}
+      }
+			
+      break;
+    }
+  }
 }
 
 // An object containing the tab and its age.  FIXME: the rest of the
@@ -183,53 +183,53 @@ function reopenTab(tabId)
 // Chrome's POV) but is perhaps not to be relied on?
 function tabInfo(tab, count)
 {
-	this.tab = tab;
-	this.count = count;
+  this.tab = tab;
+  this.count = count;
 }
 
 //When the extension initialized, the tab of tabs in all windows are added to an array of open tabs 
 function initiatize()
 {
-	chrome.windows.getAll({"populate" : true}, function(windows)
+  chrome.windows.getAll({"populate" : true}, function(windows)
+    {
+      for(var i = 0; i < windows.length; i++)
+      {
+	for(var j = 0; j < windows[i].tabs.length; j++)
 	{
-		for(var i = 0; i < windows.length; i++)
-		{
-			for(var j = 0; j < windows[i].tabs.length; j++)
-			{
-				openTabs.push(new tabInfo(windows[i].tabs[j], 0));
-			}
-		}
+	  openTabs.push(new tabInfo(windows[i].tabs[j], 0));
+	}
+      }
 		
-		timerEvent();
-	});
+      timerEvent();
+    });
 	
-	setThresholds();
+  setThresholds();
 }
 
 function setThresholds()
 {
-	checkInternal = 60000;
+  checkInternal = 60000;
 	
-	inactiveThreshold = localStorage["inactiveThreshold"];
-	storeClosedTabsThreshold = localStorage["storeClosedTabsThreshold"]
+  inactiveThreshold = localStorage["inactiveThreshold"];
+  storeClosedTabsThreshold = localStorage["storeClosedTabsThreshold"]
 	
-	if (inactiveThreshold == null)
-	{
-		inactiveThreshold = 60;
-		localStorage["inactiveThreshold"] = inactiveThreshold;
-	}
+  if (inactiveThreshold == null)
+  {
+    inactiveThreshold = 60;
+    localStorage["inactiveThreshold"] = inactiveThreshold;
+  }
 	
-	if (storeClosedTabsThreshold == null)
-	{
-		storeClosedTabsThreshold = 1440;
-		localStorage["storeClosedTabsThreshold"] = storeClosedTabsThreshold;
-	}
+  if (storeClosedTabsThreshold == null)
+  {
+    storeClosedTabsThreshold = 1440;
+    localStorage["storeClosedTabsThreshold"] = storeClosedTabsThreshold;
+  }
 }
 
 function refreshIntervals()
 {
-	inactiveThreshold = localStorage["inactiveThreshold"];
-	storeClosedTabsThreshold = localStorage["storeClosedTabsThreshold"];
+  inactiveThreshold = localStorage["inactiveThreshold"];
+  storeClosedTabsThreshold = localStorage["storeClosedTabsThreshold"];
 }
 
 initiatize();
