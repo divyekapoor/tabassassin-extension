@@ -2,54 +2,53 @@
 <style>
 html
 {
-  font-family: 'Droid Sans', arial, serif;
-  width:500px;
+	font-family: 'Droid Sans', arial, serif;
+	width:500px;
 }
 
 div.header
 {
-  color:#333;
-  margin-top:10px;
-  text-align:left;
+	color:#333;
+	margin-top:10px;
+	text-align:left;
 }
 
 div.hr 
 { 
-  background: #666;
-  height: 1px;  
-  width: 100%;
+	background: #666;
+	height: 1px;  
+	width: 100%;
 }
 
 div.tab
 {
-  color:#666;
-  cursor:pointer;
-  margin-top:5px;
-  text-align:left;
-  width: 100%;
+	color:#666;
+	cursor:pointer;
+	margin-top:5px;
+	text-align:left;
+	width: 100%;
 }
 
 div.tab:Hover
 {
-  background-color:#69F;
-  color:#FFF;
+	background-color:#69F;
+	color:#FFF;
 }
-
 div.tabStatus
 {
-  color:#999;
-  font-size:xx-small;
-  text-align:left;
-  width: 100%;
+	color:#999;
+	font-size:xx-small;
+	text-align:left;
+	width: 100%;
 }
 
 div.message
 {
-  color:#999;
-  font-style:italic;
-  margin-top:5px;
-  text-align:left;
-  width: 100%;
+	color:#999;
+	font-style:italic;
+	margin-top:5px;
+	text-align:left;
+	width: 100%;
 }
 </style>
 <script>
@@ -58,147 +57,146 @@ var backgroundPage = chrome.extension.getBackgroundPage();
 //Adds a tab to the UI
 function addedTab(tab)
 {
-  var container = document.getElementById("container");
-  var closedTabHeader = document.getElementById("closedTabsHeader");
+	var container = document.getElementById("container");
+	var closedTabHeader = document.getElementById("closedTabsHeader");
 	
-  var openTab = document.createElement("div");
-  openTab.id = tab.id;
-  openTab.className = "tab";
-  openTab.onclick = openTabClicked;
-  openTab.innerHTML = tab.title;
+	var openTab = document.createElement("div");
+	openTab.id = tab.id;
+	openTab.className = "tab";
+	openTab.onclick = openTabClicked;
+	openTab.innerHTML = tab.title;
 	
-  container.insertBefore(openTab, closedTabHeader);
+	container.insertBefore(openTab, closedTabHeader);
 }
 
 //Calls a function on the background page to reopen a closed tab
 function closedTabClicked()
 {
-  backgroundPage.reopenTab(parseInt(this.id));
+	backgroundPage.reopenTab(parseInt(this.id));
 }
 
 // Displays the opened and closed tabs to the user
 function display()
 {
-  var container = document.createElement("div");
-  container.id = "container";
+	var container = document.createElement("div");
+	container.id = "container";
 	
-  var openTabHeader = document.createElement("div");
-  openTabHeader.id = "openTabsHeader";
-  openTabHeader.className = "header";
-  openTabHeader.innerHTML = "Open tabs";
+	var openTabHeader = document.createElement("div");
+	openTabHeader.id = "openTabsHeader";
+	openTabHeader.className = "header";
+	openTabHeader.innerHTML = "Open tabs";
 	
-  container.appendChild(openTabHeader);
+	container.appendChild(openTabHeader);
 	
-  var openTabRuler = document.createElement("div");
-  openTabRuler.id = "openTabRuler";
-  openTabRuler.className = "hr";
+	var openTabRuler = document.createElement("div");
+	openTabRuler.id = "openTabRuler";
+	openTabRuler.className = "hr";
 	
-  container.appendChild(openTabRuler);
+	container.appendChild(openTabRuler);
 	
-  if(backgroundPage.openTabs.length > 0)
-  {
-    for (var i = 0; i < backgroundPage.openTabs.length; i++)
-    {
-      var openTab = document.createElement("div");
-      openTab.id = backgroundPage.openTabs[i].tab.id;
-      openTab.className = "tab";
-      openTab.onclick = openTabClicked;
-      openTab.innerHTML = backgroundPage.openTabs[i].tab.title;
+	if(backgroundPage.openTabs.length > 0)
+	{
+		for (var i = 0; i < backgroundPage.openTabs.length; i++)
+		{
+			var openTab = document.createElement("div");
+			openTab.id = backgroundPage.openTabs[i].tab.id;
+			openTab.className = "tab";
+			openTab.onclick = openTabClicked;
+			openTab.innerHTML = backgroundPage.openTabs[i].tab.title;
 
-      container.appendChild(openTab);
+			container.appendChild(openTab);
 			
-      var openTabStatus = document.createElement("div");
-      openTabStatus.className = "tabStatus";
-      openTabStatus.innerHTML = "[Inactive for " + backgroundPage.openTabs[i].count + " minutes]";
-      /*if (backgroundPage.openTabs[i].tab.selected == true)
+			var openTabStatus = document.createElement("div");
+			openTabStatus.className = "tabStatus";
+			openTabStatus.innerHTML = "[Inactive for " + backgroundPage.openTabs[i].count + " minutes]";
+		  /*if (backgroundPage.openTabs[i].tab.selected == true)
       {
-        openTabStatus.innerHTML = "[Inactive for 0 minutes]";
+           openTabStatus.innerHTML = "[Inactive for 0 minutes]";
       }
       else
       {
-        openTabStatus.innerHTML = "[Inactive for " + backgroundPage.openTabs[i].count + " minutes]";
+           openTabStatus.innerHTML = "[Inactive for " + backgroundPage.openTabs[i].count + " minutes]";
       }*/
 			
-      container.appendChild(openTabStatus);
-    }
-  }
-  else
-  {
-    var noOpenTabsMessage = document.createElement("div");
-    noOpenTabsMessage.id = "closedTabsHeader";
-    noOpenTabsMessage.className = "message";
-    noOpenTabsMessage.innerHTML = "There are no opens tabs. Impossible!";
+			container.appendChild(openTabStatus);
+		}
+	}
+	else
+	{
+		var noOpenTabsMessage = document.createElement("div");
+		noOpenTabsMessage.id = "closedTabsHeader";
+		noOpenTabsMessage.className = "message";
+		noOpenTabsMessage.innerHTML = "There are no opens tabs. Impossible!";
 		
-    container.appendChild(noOpenTabsMessage);
-  }
+		container.appendChild(noOpenTabsMessage);
+	}
 	
-  var closedTabHeader = document.createElement("div");
-  closedTabHeader.id = "closedTabsHeader";
-  closedTabHeader.className = "header";
-  closedTabHeader.innerHTML = "Assassinated tabs";
-  container.appendChild(closedTabHeader);
+	var closedTabHeader = document.createElement("div");
+	closedTabHeader.id = "closedTabsHeader";
+	closedTabHeader.className = "header";
+	closedTabHeader.innerHTML = "Assassinated tabs";
+	container.appendChild(closedTabHeader);
 	
-  var closedTabRuler = document.createElement("div");
-  closedTabRuler.id = "closedTabRuler";
-  closedTabRuler.className = "hr";
+	var closedTabRuler = document.createElement("div");
+	closedTabRuler.id = "closedTabRuler";
+	closedTabRuler.className = "hr";
 	
-  container.appendChild(closedTabRuler);
+	container.appendChild(closedTabRuler);
 	
-  if(backgroundPage.closedTabs.length > 0)
-  {
-    for (var i = 0; i < backgroundPage.closedTabs.length; i++)
-    {
-      var closedTab = document.createElement("div");
-      closedTab.id = backgroundPage.closedTabs[i].tab.id;
-      closedTab.className = "tab";
-      closedTab.onclick = closedTabClicked;
-      closedTab.innerHTML = backgroundPage.closedTabs[i].tab.title;
+	if(backgroundPage.closedTabs.length > 0)
+	{
+		for (var i = 0; i < backgroundPage.closedTabs.length; i++)
+		{
+			var closedTab = document.createElement("div");
+			closedTab.id = backgroundPage.closedTabs[i].tab.id;
+			closedTab.className = "tab";
+			closedTab.onclick = closedTabClicked;
+			closedTab.innerHTML = backgroundPage.closedTabs[i].tab.title;
 			
-      container.appendChild(closedTab);
+			container.appendChild(closedTab);
 			
-      var closedTabStatus = document.createElement("div");
-      closedTabStatus.className = "tabStatus";
-      closedTabStatus.innerHTML = "[Closed for "
-	+ backgroundPage.closedTabs[i].count + " minutes]"
-
-      container.appendChild(closedTabStatus);
-    }
-  }
-  else
-  {
-    var noClosedTabsMessage = document.createElement("div");
-    noClosedTabsMessage.id = "closedTabsHeader";
-    noClosedTabsMessage.className = "message";
-    noClosedTabsMessage.innerHTML = "There are no closed tabs.";
+			var closedTabStatus = document.createElement("div");
+			closedTabStatus.className = "tabStatus";
+			closedTabStatus.innerHTML = "[Closed for " + backgroundPage.closedTabs[i].count + " minutes]"
+			
+			container.appendChild(closedTabStatus);
+		}
+	}
+	else
+	{
+		var noClosedTabsMessage = document.createElement("div");
+		noClosedTabsMessage.id = "closedTabsHeader";
+		noClosedTabsMessage.className = "message";
+		noClosedTabsMessage.innerHTML = "There are no closed tabs.";
 		
-    container.appendChild(noClosedTabsMessage);
-  }
+		container.appendChild(noClosedTabsMessage);
+	}
 	
-  document.body.appendChild(container);
+	document.body.appendChild(container);
 }
 
 //Calls a function on the background page to focus on an open tab
 function openTabClicked()
 {
-  backgroundPage.selectTab(parseInt(this.id));
+	backgroundPage.selectTab(parseInt(this.id));
 }
 
 //Removes a tab from the UI
 function removeTab(tabId)
 {
-  var container = document.getElementById("container");
-  var tabDiv = document.getElementById(tabId);
-  container.removeChild(tabDiv);
+	var container = document.getElementById("container");
+	var tabDiv = document.getElementById(tabId);
+	container.removeChild(tabDiv);
 	
-  if (backgroundPage.closedTabs.length == 0)
-  {
-    var noClosedTabsMessage = document.createElement("div");
-    noClosedTabsMessage.id = "closedTabsHeader";
-    noClosedTabsMessage.className = "message";
-    noClosedTabsMessage.innerHTML = "There are no closed tabs.";
+	if (backgroundPage.closedTabs.length == 0)
+	{
+		var noClosedTabsMessage = document.createElement("div");
+		noClosedTabsMessage.id = "closedTabsHeader";
+		noClosedTabsMessage.className = "message";
+		noClosedTabsMessage.innerHTML = "There are no closed tabs.";
 		
-    container.appendChild(noClosedTabsMessage);
-  }
+		container.appendChild(noClosedTabsMessage);
+	}
 }
 </script>
 <head>

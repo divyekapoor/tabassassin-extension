@@ -1,7 +1,7 @@
 <html>
 <head>
 <link href='http://fonts.googleapis.com/css?family=Droid+Sans' rel='stylesheet' type='text/css'>
-<title>D-Tabs Options</title>
+<title>Tab Assassin Options</title>
 </head>
 <style>
 html
@@ -20,12 +20,312 @@ h1
 	color:#F00;
 }
 
+#error
+{
+	font-size:smaller;
+	font-style:italic;
+	color:#F00;
+}
+
 .noError
 {
 	color:#666;
 }
+
+.option
+{
+	margin-bottom:20px;
+}
+
+.whitelistUrlTextboxError
+{
+	outline-color:#F00;
+}
+
+.whitelistedUrlContainer
+{
+	font-size:small;
+	width:50%;
+	height:25px;
+}
+
+.whitelistedUrlTextLabelContainer
+{
+	width:75%;
+	float:left;
+	cursor:default;
+}
+
+.removeWhitelistedUrlContainer
+{
+	width:15%;
+	float:right;
+	cursor:pointer;
+}
+
+#whiteListedUrlInputContainer
+{
+	margin-bottom:10px;
+}
 </style>
 <script type="text/javascript">
+var backgroundPage = chrome.extension.getBackgroundPage();
+
+function addToWhitelist()
+{
+	resetErrorMessages();
+	
+	var url = document.getElementById("whitelisturl").value;
+	
+	if (isUrl(url))
+	{
+		url = normalizeUrl(url);
+		
+	  doesTabAssassinFolderExist(url)
+	}
+	else
+	{
+		document.getElementById("whitelisturl").className = "whitelistUrlTextboxError";
+		document.getElementById("whitelisturl").focus();
+		document.getElementById("error").innerHTML = "Not a valid website address.";
+	}
+}
+
+function normalizeUrl(url)
+{
+	var pattern = "^(www.){1}([0-9A-Za-z]+\.)";
+	
+	//If the url does not include http:// add it
+	if (url.match(pattern))
+	{
+		url = "http://" + url;	
+	}
+	
+	if (url.charAt(url.length - 1) != '/')
+	{
+			url = url + "/";
+	}
+	
+	return url;
+}
+
+function doesTabAssassinFolderExist(url)
+{
+	chrome.bookmarks.getChildren('2', function(bookmarks) 
+	{
+		var tabAssassinFolder = getBookmarkFolder(bookmarks, "Tab Assassin");
+		
+		//If the MyTabs folder does not exist, create a MyTabs folder
+		if (tabAssassinFolder == null)
+		{
+			//Create a MyTabs folder
+			chrome.bookmarks.create({'parentId' : '2', 'title' : 'Tab Assassin'}, function(tabAssassinFolder) 
+			{
+				console.log("Created a Tab Assassin folder.");
+				//Created the Tab Assassin folder
+				addUrlToWhitelist(tabAssassinFolder, url);
+			});
+		}
+		else
+		{
+			addUrlToWhitelist(tabAssassinFolder, url);
+		}
+	});
+}
+
+function getBookmarkFolder(bookmarks, folderName)
+{
+	var bookmarkFolder;
+
+	for (var i = 0; i < bookmarks.length; i++) 
+	{
+		if (bookmarks[i].title == folderName && !bookmarks[i].url) 
+		{
+			bookmarkFolder = bookmarks[i];
+			break;
+		}
+	}
+	
+	return bookmarkFolder;
+}
+
+function addUrlToWhitelist(tabAssassinFolder, url)
+{
+	chrome.bookmarks.getChildren(tabAssassinFolder.id, function(whitelistedUrls)
+	{
+			var doesUrlExist = false;
+			
+			for (var i = 0; i < whitelistedUrls.length; i++)
+			{
+				if (whitelistedUrls[i].url == url)
+				{
+					doesUrlExist = true;
+					break;
+				}
+				else
+				{
+					doesUrlExist = false;	
+				}
+			}
+			
+			if (doesUrlExist == false)
+			{
+				chrome.bookmarks.create({'parentId' : tabAssassinFolder.id, 'title' : url, 'url' : url}, function(whitelistedUrl)
+				{
+					updateWhitelistedUrls();
+				});
+				displayWhitelistedUrl(url);
+			}
+			else
+			{
+				document.getElementById("whitelisturl").className = "whitelistUrlTextboxError";
+				document.getElementById("whitelisturl").focus();
+				document.getElementById("error").innerHTML = "That website address has already been added.";
+			}
+	});
+}
+
+function updateWhitelistedUrls()
+{
+	chrome.bookmarks.getChildren('2', function(bookmarks) 
+	{
+		var tabAssassinFolder = getBookmarkFolder(bookmarks, "Tab Assassin");
+		
+		//If the Tab Assassin folder does exist
+		if (tabAssassinFolder != null)
+		{
+			chrome.bookmarks.getChildren(tabAssassinFolder.id, function(whitelistedUrlBookmarks)
+			{
+				backgroundPage.whitelistedUrls = whitelistedUrlBookmarks;
+			});
+		}
+	});
+}
+
+function displayWhitelistedUrl(url)
+{
+	var containerDiv = document.createElement("div");
+	containerDiv.id = "ContainerFor" + url;
+	containerDiv.className = "whitelistedUrlContainer";
+	
+	var textLabelContainerDiv = document.createElement("div");
+	textLabelContainerDiv.className = "whitelistedUrlTextLabelContainer";
+	textLabelContainerDiv.innerHTML = url;
+	
+	var removeContainerDiv = document.createElement("div");
+	removeContainerDiv.className = "removeWhitelistedUrlContainer";
+	
+	var removeWhitelistedUrlImage = document.createElement("img");
+	removeWhitelistedUrlImage.id = url;
+	//removeWhitelistedUrlImage.className = "removeWhitelistedUrlContainer";
+	removeWhitelistedUrlImage.src = "images/remove.png";
+	removeWhitelistedUrlImage.alt = "Remove";
+	removeWhitelistedUrlImage.title = "Remove";
+	removeWhitelistedUrlImage.onmouseover = removeImageMouseOver;
+	removeWhitelistedUrlImage.onmouseout = removeImageMouseOut;
+	removeWhitelistedUrlImage.onmouseup = removeWhitelistedUrl;
+	
+	removeContainerDiv.appendChild(removeWhitelistedUrlImage);
+	
+	containerDiv.appendChild(textLabelContainerDiv);
+	containerDiv.appendChild(removeContainerDiv);
+	
+	document.getElementById("urlWhitelist").insertBefore(containerDiv, document.getElementById("urlWhitelist").firstChild);
+}
+
+function displayWhitelistedUrls()
+{
+	chrome.bookmarks.getChildren('2', function(bookmarks) 
+	{
+		var tabAssassinFolder = getBookmarkFolder(bookmarks, "Tab Assassin");
+		
+		//If the Tab Assassin folder does exist
+		if (tabAssassinFolder != null)
+		{
+			chrome.bookmarks.getChildren(tabAssassinFolder.id, function(whitelistedUrls)
+			{
+				for (var i = 0; i < whitelistedUrls.length; i++)
+				{
+					var containerDiv = document.createElement("div");
+					containerDiv.id = "ContainerFor" + whitelistedUrls[i].url;
+					containerDiv.className = "whitelistedUrlContainer";
+					
+					var textLabelContainerDiv = document.createElement("div");
+					textLabelContainerDiv.className = "whitelistedUrlTextLabelContainer";
+					textLabelContainerDiv.innerHTML = whitelistedUrls[i].url;
+					
+					var removeContainerDiv = document.createElement("div");
+					removeContainerDiv.className = "removeWhitelistedUrlContainer";
+					
+					var removeWhitelistedUrlImage = document.createElement("img");
+					removeWhitelistedUrlImage.id = whitelistedUrls[i].url;
+					//removeWhitelistedUrlImage.className = "removeWhitelistedUrlContainer";
+					removeWhitelistedUrlImage.src = "images/remove.png";
+					removeWhitelistedUrlImage.alt = "Remove";
+					removeWhitelistedUrlImage.title = "Remove";
+					removeWhitelistedUrlImage.onmouseover = removeImageMouseOver;
+					removeWhitelistedUrlImage.onmouseout = removeImageMouseOut;
+					removeWhitelistedUrlImage.onmouseup = removeWhitelistedUrl;
+					
+					removeContainerDiv.appendChild(removeWhitelistedUrlImage);
+					
+					containerDiv.appendChild(textLabelContainerDiv);
+					containerDiv.appendChild(removeContainerDiv);
+					
+					document.getElementById("urlWhitelist").insertBefore(containerDiv, document.getElementById("urlWhitelist").firstChild);
+					
+					backgroundPage.whitelistedUrls = whitelistedUrls;
+				}
+			});
+		}
+	});
+}
+
+function removeWhitelistedUrl()
+{
+	var url = this.id;
+	
+	chrome.bookmarks.getChildren('2', function(bookmarks) 
+	{
+		var tabAssassinFolder = getBookmarkFolder(bookmarks, "Tab Assassin");
+		
+		//If the Tab Assassin folder does exist
+		if (tabAssassinFolder != null)
+		{
+			chrome.bookmarks.getChildren(tabAssassinFolder.id, function(whitelistedUrls)
+			{
+				for (var i = 0; i < whitelistedUrls.length; i++)
+				{
+					if (whitelistedUrls[i].url == url)
+					{
+						chrome.bookmarks.remove(whitelistedUrls[i].id, function()
+						{
+							updateWhitelistedUrls();	
+						});
+						break;
+					}
+				}
+			});
+		}
+	});
+	
+	document.getElementById("urlWhitelist").removeChild(document.getElementById("ContainerFor" + url));
+}
+
+function isUrl(url)
+{
+	var pattern = "^(http:\/\/www.|https:\/\/www.|www.){1}([0-9A-Za-z]+\.)";
+	
+	if (url.match(pattern))
+	{
+		return true;	
+	}
+	else
+	{
+		return false;
+	}
+}
+
 // Saves options to localStorage.
 function saveOptions() 
 {
@@ -157,6 +457,22 @@ function errorMessage(message)
 	status.innerHTML = message;
 }
 
+function prepForInput()
+{
+	var url = document.getElementById("whitelisturl").value;
+	
+	if (url == "e.g. www.google.com")
+	{
+		document.getElementById("whitelisturl").value = "";
+	} 
+}
+
+function resetErrorMessages()
+{
+	document.getElementById("whitelisturl").className = "";
+	document.getElementById("error").innerHTML = "";
+}
+
 // Restores select box state to saved value from localStorage.
 function restoreOptions() 
 {
@@ -221,10 +537,24 @@ function restoreOptions()
 	{
 		document.getElementById("closedDays").selected = true;
 	}
+	
+	displayWhitelistedUrls();
+}
+
+function removeImageMouseOver()
+{
+	this.src = "images/removeOnHover.png";
+}
+
+function removeImageMouseOut()
+{
+	this.src = "images/remove.png";
 }
 </script>
 <body onLoad="restoreOptions()">
-<h1>D-Tabs Options</h1>
+<div id="options">
+<h1>Tab Assassin Options</h1>
+<div id="inactiveOptionDiv" class="option">
 How long should a tab have been inactive before it is closed?<br />
 <input id="inactiveTime" type="text" value="1" size="2" />
 <select id="inactiveTimeUnits">
@@ -232,8 +562,8 @@ How long should a tab have been inactive before it is closed?<br />
 	<option id="inactivityHours" value="hours">hours</option>
 	<option id="inactivityDays" value="days">days</option>
 </select>
-<br />
-<br />
+</div>
+<div id="closedOptionDiv" class="option">
 How long should a tab have been closed before it is removed?<br />
 <input id="closedTime" type="text" value="1" size="2" />
 <select id="closedTimeUnits">
@@ -241,9 +571,20 @@ How long should a tab have been closed before it is removed?<br />
  <option id="closedHours" value="hours">hours</option>
  <option id="closedDays" value="days">days</option>
 </select>
-<br />
-<br />
+</div>
+<div id="whitelistOptionDiv" class="option">
+Are there any websites that should not be closed?<br />
+<div id="whiteListedUrlInputContainer">
+<input id="whitelisturl" type="text" value="e.g. www.google.com" size="20" onClick="prepForInput()" />
+<button onClick="addToWhitelist()">Add</button>
+</div>
+<div id="error" class="error"></div>
+<div id="urlWhitelist"></div>
+</div>
+<div id="saveDiv" class="option">
 <button onClick="saveOptions()">Save</button>
 <div id="status"></div>
+</div>
+</div>
 </body>
 </html>
