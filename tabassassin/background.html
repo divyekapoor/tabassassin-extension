@@ -11,6 +11,8 @@ var chromeUsed = false;
 
 var whitelistedUrls;
 
+var detachedTab;
+
 //When a tab is opened by the user, that tab is added to an array of open tabs
 chrome.tabs.onCreated.addListener(function(tab) 
 {
@@ -82,12 +84,31 @@ chrome.tabs.onSelectionChanged.addListener(function(tabId, selectInfo)
 
 chrome.tabs.onAttached.addListener(function(tabId, attachInfo)
 {
-  //Do nothing.  We don't care about atteched tabs... do we?
+	chromeUsed = true;
+	
+	if (detachedTab != null)
+	{
+		if(tabId == detachedTab.id)
+		{
+			openTabs.push(new tabInfo(tab, 0));
+		}
+	}
 });
 
 chrome.tabs.onDetached.addListener(function(tabId, detachInfo) 
 {
-  //Do nothing.  We don't care about detached tabs... do we?
+	chromeUsed = true;
+	
+	for (var i = 0; i < openTabs.length; i++)
+	{
+		if (openTabs[i].tab.id == tabId)
+		{
+			detachedTab = openTabs[i].tab;
+			
+			openTabs.splice(i, 1);
+			break;
+		}
+	}
 });
 
 //When a tab is removed by the user, that tab is removed from an array of open tabs
