@@ -1,0 +1,52 @@
+html {
+  color: #666;
+  font-family: 'Droid Sans', arial, serif;
+}
+
+h1 {
+  color: #333;
+}
+
+.error {
+  color: #F00;
+}
+
+#error {
+  color: #F00;
+  font-size: smaller;
+  font-style: italic;
+}
+
+.noError {
+  color: #666;
+}
+
+.option {
+  margin-bottom: 20px;
+}
+
+.whitelistUrlTextboxError {
+  outline-color: #F00;
+}
+
+.whitelistedUrlContainer {
+  font-size: small;
+  height: 25px;
+  width: 50%;
+}
+
+.whitelistedUrlTextLabelContainer {
+  cursor: default;
+  float: left;
+  width: 75%;
+}
+
+.removeWhitelistedUrlContainer {
+  cursor: pointer;
+  float: right;
+  width: 15%;
+}
+
+#whiteListedUrlInputContainer {
+  margin-bottom: 10px;
+}
