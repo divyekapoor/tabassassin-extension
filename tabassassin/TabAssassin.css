@@ -1,5 +1,9 @@
 html {
+  overflow-x: hidden;
   text-align: left;
+}
+
+body {
   width: 500px;
 }
 
@@ -11,22 +15,31 @@ html {
 
 .tabEntry {
   cursor: pointer;
+  display: -webkit-box;
   padding: 5px;
+  white-space: nowrap;
   -webkit-transition: background-color 0.15s;
 }
 
 .tabEntry span {
+  display: inline-block;
   -webkit-transition: color 0.15s;
 }
 
 .tabTitle {
   color: #666;
-  display: block;
+  margin-right: 5px;
+  max-width: 70%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  -webkit-box-flex: 1;
 }
 
 .tabStatus {
   color: #999;
   font-size: x-small;
+  -webkit-transform: translate(0, -2px);
 }
 
 .tabEntry:hover {
@@ -43,6 +56,17 @@ html {
   margin-top: 5px;
 }
 
+.section {
+  width: 100%;
+}
+
 #noClosedTabs:not(:last-of-type) {
   display: none;
+}
+
+.tabList {
+  overflow-x: hidden;
+  overflow-y: auto;
+  margin-top: 5px;
+  max-height: 200px;
 }

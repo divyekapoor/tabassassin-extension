@@ -8,8 +8,8 @@ function closedTabClicked() {
 // Displays the opened and closed tabs to the user.
 function populateTabs() {
   var tabEntryTemplate = $('tabEntryTemplate');
-  var openTabsSection = $('openTabsSection');
 
+  var openTabsList = document.querySelector('#openTabsSection .tabList');
   backgroundPage.openTabs.forEach(function(tabInfo) {
     var openTab = tabEntryTemplate.cloneNode(true);
     openTab.id = tabInfo.tab.id;
@@ -21,11 +21,11 @@ function populateTabs() {
         '[Inactive for ' + (tabInfo.ticks || '< 1') + ' minutes]';
     openTab.querySelector('.tabStatus').textContent = displayText;
 
-    openTabsSection.appendChild(openTab);
+    openTabsList.appendChild(openTab);
     openTab.hidden = false;
   });
 
-  var closedTabsSection = $('closedTabsSection');
+  var closedTabsList = document.querySelector('#closedTabsSection .tabList');
   backgroundPage.closedTabs.forEach(function(tabInfo) {
     var closedTab = tabEntryTemplate.cloneNode(true);
     closedTab.id = tabInfo.tab.id;
@@ -36,7 +36,7 @@ function populateTabs() {
     closedTab.querySelector('.tabStatus').textContent =
         '[Closed for ' + (tabInfo.ticks || '< 1') + ' minutes]';
 
-    closedTabsSection.appendChild(closedTab);
+    closedTabsList.appendChild(closedTab);
     closedTab.hidden = false;
   });
 }
