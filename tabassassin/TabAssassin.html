@@ -4,11 +4,34 @@
   <link rel="stylesheet"
       href="http://fonts.googleapis.com/css?family=Droid+Sans">
   <link rel="stylesheet" href="TabAssassin.css">
+  <link rel="stylesheet" href="shared.css">
   <script src="util.js"></script>
   <script src="TabAssassin.js"></script>
 </head>
 
 <body>
+
+  <div id="openTabsSection">
+    <div class="header">
+    Open tabs
+    </div>
+
+  </div>
+
+  <div id="closedTabsSection">
+    <div class="header">
+    Assassinated tabs
+    </div>
+    <div id="noClosedTabs" class="message">
+      The are no closed tabs.
+    </div>
+  </div>
+
 </body>
+
+<div id="tabEntryTemplate" class="tabEntry" hidden>
+  <span class="tabTitle"></span>
+  <span class="tabStatus"></span>
+</div>
 
 </html>

@@ -8,7 +8,7 @@ var closedTabs = new Array();
 
 // In milliseconds, the polling interval to perform updates. This is also the
 // length of a 'tick'.
-var updateTabsInterval = 60000;
+var updateTabsInterval = 1000; //60000;
 
 // In minutes, the amount of time to wait before closing a tab.
 var inactiveThreshold;
