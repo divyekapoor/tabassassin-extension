@@ -8,18 +8,23 @@ var closedTabs = new Array();
 
 // In milliseconds, the polling interval to perform updates. This is also the
 // length of a 'tick'.
-var updateTabsInterval = 1000; //60000;
+var updateTabsInterval = 60000;
 
 // In minutes, the amount of time to wait before closing a tab.
 var inactiveThreshold;
+
+// In seconds, the amount of time since user interaction with the browser that
+// counts as idle.
+var idleThreshold = 600;
+
+// Whether Chrome is currently idle.
+var chromeIdle = false;
 
 // In minutes, the amount of time to wait before 'forgetting' a closed tab.
 var storeClosedTabsThreshold;
 
 // An array of URLs that will never be closed.
 var whitelistedUrls = new Array();
-
-var detachedTab;
 
 // Gets the TabAssassin UI (browser action bubble view).
 function getBubbleView() {
@@ -43,9 +48,6 @@ function getTabById(tabs, id) {
 
 chrome.tabs.onCreated.addListener(function(tab) {
   openTabs.push(new TabInfo(tab));
-  var bubbleView = getBubbleView();
-  if (bubbleView)
-    bubbleView.addedTab(tab);
 });
 
 chrome.tabs.onRemoved.addListener(function(tabId, removeInfo) {
@@ -61,8 +63,14 @@ chrome.tabs.onUpdated.addListener(function(tabId, changeInfo, tab) {
 });
 
 chrome.tabs.onSelectionChanged.addListener(function(tabId, selectInfo) {
-  var tabInfo = getTabById(openTabs, tabId);
-  tabInfo.ticks = 0;
+  openTabs.forEach(function(tabInfo) {
+    if (tabInfo.tab.id == tabId) {
+      tabInfo.ticks = 0;
+      tabInfo.tab.selected = true;
+    } else if (selectInfo.windowId == tabInfo.tab.windowId) {
+      tabInfo.tab.selected = false;
+    }
+  });
 });
 
 /*
@@ -100,6 +108,15 @@ function getBookmarkFolder(bookmarks, folderName) {
 // Inactive tabs are closed, removed from an array of open tabs and added to
 // an array of closed tabs.
 function updateTabs() {
+  setTimeout('updateTabs()', updateTabsInterval);
+
+  if (chromeIdle)
+    return;
+
+  // Chrome only reports the transition from idle to active, so we have to check
+  // for active to idle.
+  chrome.idle.queryState(idleThreshold, updateIdleState);
+
   openTabs.forEach(function(tabInfo) {
     if (tabInfo.ticks >= inactiveThreshold &&
         !tabInfo.tab.selected &&
@@ -120,8 +137,6 @@ function updateTabs() {
   closedTabs.forEach(function(tabInfo) {
     tabInfo.ticks++;
   });
-
-  setTimeout('updateTabs()', updateTabsInterval);
 }
 
 // Focuses an open tab selected from the bubble UI.
@@ -131,7 +146,7 @@ function selectTab(tabId) {
 
 // Reopens an assassinated tab selected from the Tab Assassin UI
 function reopenTab(tabId) {
-  var tab = getTabById(closedTabs, tabId);
+  var tabInfo = getTabById(closedTabs, tabId);
   closedTabs = closedTabs.filter(function(closedTab) {
     return closedTab.tab.id != tabId;
   });
@@ -139,7 +154,7 @@ function reopenTab(tabId) {
   var bubbleView = getBubbleView();
   if (bubbleView)
     bubbleView.removeTab(tabId);
-  chrome.tabs.create({url : tab.url});
+  chrome.tabs.create({url : tabInfo.tab.url});
 }
 
 // An object containing the tab and its age.  FIXME: the rest of the
@@ -180,6 +195,11 @@ function setThresholds() {
   storeClosedTabsThreshold = localStorage['storeClosedTabsThreshold'] || 1440;
 }
 
+// Callback to update local cache of whether Chrome is idle.
+function updateIdleState(newState) {
+  chromeIdle = (newState !== 'active');
+}
+
 // When the extension initialized, the tab of tabs in all windows are added to
 // an array of open tabs.
 function initialize() {
@@ -190,6 +210,8 @@ function initialize() {
       }
     }
   });
+
+  chrome.idle.onStateChanged.addListener(updateIdleState);
 
   setThresholds();
   updateWhitelistedUrls();

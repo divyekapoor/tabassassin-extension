@@ -43,6 +43,6 @@ html {
   margin-top: 5px;
 }
 
-#noClosedTabs:not(:last-child) {
+#noClosedTabs:not(:last-of-type) {
   display: none;
 }

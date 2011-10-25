@@ -1,19 +1,5 @@
 var backgroundPage = chrome.extension.getBackgroundPage();
 
-//Adds a tab to the UI
-function addedTab(tab) {
-  var container = $('container');
-  var closedTabHeader = $('closedTabsHeader');
-
-  var openTab = createNode('div');
-  openTab.id = tab.id;
-  openTab.className = 'tab';
-  openTab.onclick = openTabClicked;
-  openTab.innerHTML = tab.title;
-
-  container.insertBefore(openTab, closedTabHeader);
-}
-
 //Calls a function on the background page to reopen a closed tab
 function closedTabClicked() {
   backgroundPage.reopenTab(parseInt(this.id));

@@ -11,6 +11,7 @@
   "permissions": [
     "tabs",
     "bookmarks",
-    "background"
+    "background",
+    "idle"
   ]
 }
