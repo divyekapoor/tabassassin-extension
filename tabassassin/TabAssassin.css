@@ -15,7 +15,6 @@ body {
 
 .tabEntry {
   cursor: pointer;
-  display: -webkit-box;
   padding: 5px;
   white-space: nowrap;
   -webkit-transition: background-color 0.15s;
@@ -33,7 +32,6 @@ body {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-  -webkit-box-flex: 1;
 }
 
 .tabStatus {
