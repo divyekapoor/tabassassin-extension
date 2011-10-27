@@ -261,7 +261,7 @@ function saveOptions() {
     localStorage['storeClosedTabsThreshold'] = closedTime;
 
     var backgroundPage = chrome.extension.getBackgroundPage();
-    backgroundPage.refreshIntervals();
+    backgroundPage.setThresholds();
 
     var status = $('status');
     status.className = 'noError';
@@ -276,9 +276,9 @@ function validateForm()
 {
   var inactiveTime = $('inactiveTime').value;
 
-  if (typeof inactiveTime == 'undefined' || inactiveTime == null || inactiveTime.length == 0)
-  {
-    errorMessage('The time a tab can be inactive before it is closed cannot be empty.')
+  if (!inactiveTime) {
+    errorMessage(
+        'The time a tab can be inactive before it is closed cannot be empty.');
     return false;
   }
 

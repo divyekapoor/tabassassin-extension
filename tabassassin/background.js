@@ -97,6 +97,7 @@ chrome.tabs.onAttached.addListener(function(tabId, attachInfo) {
   var tabInfo = getTabById(openTabs, tabId);
   tabInfo.detached = false;
   tabInfo.ticks = 0;
+  tabInfo.tab.windowId = attachInfo.newWindowId;
 });
 
 chrome.tabs.onDetached.addListener(function(tabId, detachInfo) {

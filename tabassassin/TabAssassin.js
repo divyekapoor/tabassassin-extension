@@ -20,7 +20,10 @@ function closedTabClicked() {
 }
 
 function minutesText(ticks) {
-  return ticks ? ticks + ' minutes' : '< 1 minute';
+  if (ticks >= 120)
+    return Math.floor(ticks / 60) + ' hours ago';
+
+  return ticks ? ticks + ' minutes ago' : '< 1 minute ago';
 }
 
 function indexOfTab(tabId, tabs) {
@@ -56,8 +59,8 @@ function populateTabs(tabs) {
 
     openTab.querySelector('.tabTitle').textContent = tabInfo.tab.title;
 
-    var displayText = tabInfo.tab.selected ? 'Active' :
-        'Inactive for ' + minutesText(tabInfo.ticks);
+    var displayText = tabInfo.tab.selected ? 'In use' :
+        'Last used ' + minutesText(tabInfo.ticks);
     openTab.querySelector('.tabStatus').textContent = displayText;
     if (tabInfo.tab.selected)
       openTab.classList.add('selected');
@@ -69,7 +72,7 @@ function populateTabs(tabs) {
   var closedTabsList = document.querySelector('#closedTabsSection .tabList');
   var lastClosedTab = null;
   backgroundPage.closedTabs.forEach(function(tabInfo) {
-    if (indexOfTab(tabInfo.tab.id, tabs) == -1)
+    if (tabInfo.tab.windowId != tabs[0].windowId)
       return;
 
     var closedTab = tabEntryTemplate.cloneNode(true);
@@ -78,7 +81,7 @@ function populateTabs(tabs) {
 
     closedTab.querySelector('.tabTitle').textContent = tabInfo.tab.title;
     closedTab.querySelector('.tabStatus').textContent =
-        'Removed for ' + minutesText(tabInfo.ticks);
+        'Removed ' + minutesText(tabInfo.ticks);
 
     // Reverse the order (most recently closed first).
     closedTabsList.insertBefore(closedTab, lastClosedTab);
