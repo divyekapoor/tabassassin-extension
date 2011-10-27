@@ -74,9 +74,8 @@ chrome.tabs.onSelectionChanged.addListener(function(tabId, selectInfo) {
 });
 
 /*
-chrome.tabs.onMoved.addListener(function(tabId, moveInfo)
-{
-  //Do nothing.  We don't care about moved tabs... do we?
+chrome.tabs.onMoved.addListener(function(tabId, moveInfo) {
+
 });
 */
 

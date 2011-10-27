@@ -1,6 +1,6 @@
 <html>
-
 <head>
+  <meta charset="utf-8">
   <link rel="stylesheet"
       href="http://fonts.googleapis.com/css?family=Droid+Sans">
   <link rel="stylesheet" href="TabAssassin.css">
@@ -20,11 +20,11 @@
 
   <div id="closedTabsSection" class="section">
     <div class="header">
-      Assassinated tabs
+      Recently assassinated
     </div>
     <div class="tabList">
       <div id="noClosedTabs" class="message">
-        There are no closed tabs.
+        No tabs removed from this window.
       </div>
     </div>
   </div>
@@ -32,6 +32,7 @@
 </body>
 
 <div id="tabEntryTemplate" class="tabEntry" hidden>
+  <span class="selectionIndicator">›</span>
   <span class="tabTitle"></span>
   <span class="tabStatus"></span>
 </div>

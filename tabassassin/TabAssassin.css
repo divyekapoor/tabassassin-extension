@@ -15,29 +15,38 @@ body {
 
 .tabEntry {
   cursor: pointer;
+  display: -webkit-box;
   padding: 5px;
+  position: relative;
   white-space: nowrap;
   -webkit-transition: background-color 0.15s;
 }
 
 .tabEntry span {
-  display: inline-block;
+  display: block;
   -webkit-transition: color 0.15s;
 }
 
 .tabTitle {
-  color: #666;
-  margin-right: 5px;
-  max-width: 70%;
+  margin: 0 5px;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+  -webkit-box-flex: 1;
+}
+
+.selectionIndicator,
+.tabTitle {
+  color: #666;
 }
 
 .tabStatus {
-  color: #999;
-  font-size: x-small;
-  -webkit-transform: translate(0, -2px);
+  font-size: small;
+  -webkit-transform: translate(0, 2px);
+}
+
+.tabEntry:not(:hover) .tabStatus {
+  display: none;
 }
 
 .tabEntry:hover {
@@ -46,6 +55,16 @@ body {
 
 .tabEntry:hover span {
   color: white;
+}
+
+.tabEntry:not(.selected) .selectionIndicator {
+  display: none;
+}
+
+.selectionIndicator {
+  position: absolute;
+  left: 2px;
+  top: 3px;
 }
 
 .message {
@@ -67,4 +86,18 @@ body {
   overflow-y: auto;
   margin-top: 5px;
   max-height: 200px;
+}
+
+.tabList::-webkit-scrollbar {
+  width: 8px;
+}
+
+.tabList::-webkit-scrollbar-thumb {
+  background-color: #666;
+  border-radius: 2px;
+  border-left: 3px solid white;
+}
+
+.tabList::-webkit-scrollbar-button {
+  display: none;
 }
