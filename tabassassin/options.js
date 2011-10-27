@@ -14,24 +14,32 @@
 
 var backgroundPage = chrome.extension.getBackgroundPage();
 
-function addToWhitelist()
-{
+function createRemoveWhitelistButton(url) {
+  var button = createNode('button');
+  button.url_ = url;
+  button.className = 'whitelistRemove';
+  button.title = 'Remove';
+  button.onclick = removeWhitelistedUrl;
+  return button;
+}
+
+function addToWhitelist() {
   resetErrorMessages();
 
-  var url = document.getElementById('whitelisturl').value;
+  var url = $('whitelisturl').value;
 
-  if (isUrl(url))
-  {
+  if (isUrl(url)) {
     url = normalizeUrl(url);
 
     doesTabAssassinFolderExist(url)
+  } else {
+    $('whitelisturl').className = 'whitelistUrlTextboxError';
+    $('whitelisturl').focus();
+    $('error').innerHTML = 'Not a valid website address.';
   }
-  else
-  {
-    document.getElementById('whitelisturl').className = 'whitelistUrlTextboxError';
-    document.getElementById('whitelisturl').focus();
-    document.getElementById('error').innerHTML = 'Not a valid website address.';
-  }
+
+  $('whitelisturl').value = '';
+  $('whitelisturl').blur();
 }
 
 function normalizeUrl(url)
@@ -94,91 +102,63 @@ function getBookmarkFolder(bookmarks, folderName)
 
 function addUrlToWhitelist(tabAssassinFolder, url)
 {
-  chrome.bookmarks.getChildren(tabAssassinFolder.id, function(whitelistedUrls)
-  {
+  chrome.bookmarks.getChildren(tabAssassinFolder.id, function(whitelistedUrls) {
     var doesUrlExist = false;
 
-    for (var i = 0; i < whitelistedUrls.length; i++)
-    {
-      if (whitelistedUrls[i].url == url)
-      {
+    for (var i = 0; i < whitelistedUrls.length; i++) {
+      if (whitelistedUrls[i].url == url) {
         doesUrlExist = true;
         break;
-      }
-      else
-      {
+      } else {
         doesUrlExist = false;
       }
     }
 
-    if (doesUrlExist == false)
-    {
-      chrome.bookmarks.create({'parentId' : tabAssassinFolder.id, 'title' : url, 'url' : url}, function(whitelistedUrl)
-      {
-        updateWhitelistedUrls();
-      });
+    if (!doesUrlExist) {
+      chrome.bookmarks.create({'parentId' : tabAssassinFolder.id,
+                               'title' : url,
+                               'url' : url},
+        function(whitelistedUrl) {
+          updateWhitelistedUrls();
+        });
 
       displayWhitelistedUrl(url);
-    }
-    else
-    {
-      document.getElementById('whitelisturl').className = 'whitelistUrlTextboxError';
-      document.getElementById('whitelisturl').focus();
-      document.getElementById('error').innerHTML = 'That website address has already been added.';
+    } else {
+      $('whitelisturl').className = 'whitelistUrlTextboxError';
+      $('whitelisturl').focus();
+      $('error').innerHTML = 'That website address has already been added.';
     }
   });
 }
 
-function updateWhitelistedUrls()
-{
-  chrome.bookmarks.getChildren('2', function(bookmarks)
-  {
+function updateWhitelistedUrls() {
+  chrome.bookmarks.getChildren('2', function(bookmarks) {
     var tabAssassinFolder = getBookmarkFolder(bookmarks, 'Tab Assassin');
 
-    //If the Tab Assassin folder does exist
-    if (tabAssassinFolder != null)
-    {
-      chrome.bookmarks.getChildren(tabAssassinFolder.id, function(whitelistedUrlBookmarks)
-      {
-        backgroundPage.whitelistedUrls = whitelistedUrlBookmarks;
-      });
+    if (tabAssassinFolder) {
+      chrome.bookmarks.getChildren(tabAssassinFolder.id,
+        function(whitelistedUrlBookmarks) {
+          backgroundPage.whitelistedUrls = whitelistedUrlBookmarks;
+        });
     }
   });
 }
 
-function displayWhitelistedUrl(url)
-{
-  var containerDiv = document.createElement('div');
+function displayWhitelistedUrl(url) {
+  var containerDiv = createNode('div');
   containerDiv.id = 'ContainerFor' + url;
   containerDiv.className = 'whitelistedUrlContainer';
 
-  var textLabelContainerDiv = document.createElement('div');
-  textLabelContainerDiv.className = 'whitelistedUrlTextLabelContainer';
-  textLabelContainerDiv.innerHTML = url;
-
-  var removeContainerDiv = document.createElement('div');
-  removeContainerDiv.className = 'removeWhitelistedUrlContainer';
-
-  var removeWhitelistedUrlImage = document.createElement('img');
-  removeWhitelistedUrlImage.id = url;
-  //removeWhitelistedUrlImage.className = 'removeWhitelistedUrlContainer';
-  removeWhitelistedUrlImage.src = 'images/remove.png';
-  removeWhitelistedUrlImage.alt = 'Remove';
-  removeWhitelistedUrlImage.title = 'Remove';
-  removeWhitelistedUrlImage.onmouseover = removeImageMouseOver;
-  removeWhitelistedUrlImage.onmouseout = removeImageMouseOut;
-  removeWhitelistedUrlImage.onmouseup = removeWhitelistedUrl;
-
-  removeContainerDiv.appendChild(removeWhitelistedUrlImage);
-
+  var textLabelContainerDiv = createNode('span');
+  textLabelContainerDiv.textContent = url;
   containerDiv.appendChild(textLabelContainerDiv);
-  containerDiv.appendChild(removeContainerDiv);
 
-  document.getElementById('urlWhitelist').insertBefore(containerDiv, document.getElementById('urlWhitelist').firstChild);
+  containerDiv.appendChild(createRemoveWhitelistButton(url));
+
+  $('urlWhitelist').appendChild(containerDiv);
 }
 
-function displayWhitelistedUrls()
-{
+function displayWhitelistedUrls() {
   chrome.bookmarks.getChildren('2', function(bookmarks)
   {
     var tabAssassinFolder = getBookmarkFolder(bookmarks, 'Tab Assassin');
@@ -186,116 +166,70 @@ function displayWhitelistedUrls()
     //If the Tab Assassin folder does exist
     if (tabAssassinFolder != null)
     {
-      chrome.bookmarks.getChildren(tabAssassinFolder.id, function(whitelistedUrls)
-      {
-        for (var i = 0; i < whitelistedUrls.length; i++)
-        {
-          var containerDiv = document.createElement('div');
-          containerDiv.id = 'ContainerFor' + whitelistedUrls[i].url;
-          containerDiv.className = 'whitelistedUrlContainer';
-
-          var textLabelContainerDiv = document.createElement('div');
-          textLabelContainerDiv.className = 'whitelistedUrlTextLabelContainer';
-          textLabelContainerDiv.innerHTML = whitelistedUrls[i].url;
-
-          var removeContainerDiv = document.createElement('div');
-          removeContainerDiv.className = 'removeWhitelistedUrlContainer';
-
-          var removeWhitelistedUrlImage = document.createElement('img');
-          removeWhitelistedUrlImage.id = whitelistedUrls[i].url;
-          //removeWhitelistedUrlImage.className = 'removeWhitelistedUrlContainer';
-          removeWhitelistedUrlImage.src = 'images/remove.png';
-          removeWhitelistedUrlImage.alt = 'Remove';
-          removeWhitelistedUrlImage.title = 'Remove';
-          removeWhitelistedUrlImage.onmouseover = removeImageMouseOver;
-          removeWhitelistedUrlImage.onmouseout = removeImageMouseOut;
-          removeWhitelistedUrlImage.onmouseup = removeWhitelistedUrl;
-
-          removeContainerDiv.appendChild(removeWhitelistedUrlImage);
-
-          containerDiv.appendChild(textLabelContainerDiv);
-          containerDiv.appendChild(removeContainerDiv);
-
-          document.getElementById('urlWhitelist').insertBefore(containerDiv, document.getElementById('urlWhitelist').firstChild);
+      chrome.bookmarks.getChildren(tabAssassinFolder.id,
+        function(whitelistedUrls) {
+          for (var i = 0; i < whitelistedUrls.length; i++) {
+            displayWhitelistedUrl(whitelistedUrls[i].url);
+          }
 
           backgroundPage.whitelistedUrls = whitelistedUrls;
-        }
-      });
+        });
     }
   });
 }
 
-function removeWhitelistedUrl()
-{
-  var url = this.id;
+function removeWhitelistedUrl() {
+  var url = this.url_;
 
-  chrome.bookmarks.getChildren('2', function(bookmarks)
-  {
+  chrome.bookmarks.getChildren('2', function(bookmarks) {
     var tabAssassinFolder = getBookmarkFolder(bookmarks, 'Tab Assassin');
 
     //If the Tab Assassin folder does exist
-    if (tabAssassinFolder != null)
-    {
-      chrome.bookmarks.getChildren(tabAssassinFolder.id, function(whitelistedUrls)
-      {
-        for (var i = 0; i < whitelistedUrls.length; i++)
-        {
-          if (whitelistedUrls[i].url == url)
-          {
-            chrome.bookmarks.remove(whitelistedUrls[i].id, function()
-            {
+    if (tabAssassinFolder) {
+      chrome.bookmarks.getChildren(tabAssassinFolder.id,
+          function(whitelistedUrls) {
+        for (var i = 0; i < whitelistedUrls.length; i++) {
+          if (whitelistedUrls[i].url == url) {
+            chrome.bookmarks.remove(whitelistedUrls[i].id, function() {
               updateWhitelistedUrls();
             });
 
-      break;
+           break;
           }
         }
       });
     }
   });
 
-  document.getElementById('urlWhitelist').removeChild(document.getElementById('ContainerFor' + url));
+  $('urlWhitelist').removeChild($('ContainerFor' + url));
 }
 
-function isUrl(url)
-{
+function isUrl(url) {
   var pattern = '^(http:\/\/www.|https:\/\/www.|www.){1}([0-9A-Za-z]+\.)';
 
   if (url.match(pattern))
-  {
     return true;
-  }
   else
-  {
     return false;
-  }
 }
 
 // Saves options to localStorage.
-function saveOptions()
-{
-  if(validateForm())
-  {
-    var inactiveTime = document.getElementById('inactiveTime').value;
+function saveOptions() {
+  if(validateForm()) {
+    var inactiveTime = $('inactiveTime').value;
     localStorage['inactiveTime'] = inactiveTime;
 
-    if (document.getElementById('inactivityMinutes').selected)
-    {
+    if ($('inactivityMinutes').selected) {
       inactiveTime = inactiveTime;
       localStorage['inactivityMinutesSelected'] = 'true';
       localStorage['inactivityHoursSelected'] = 'false';
       localStorage['inactivityDaysSelected'] = 'false';
-
-    }
-    else if (document.getElementById('inactivityHours').selected)
-    {
+    } else if ($('inactivityHours').selected) {
       inactiveTime = inactiveTime*60;
       localStorage['inactivityMinutesSelected'] = 'false';
       localStorage['inactivityHoursSelected'] = 'true';
       localStorage['inactivityDaysSelected'] = 'false';
-    }
-    else if (document.getElementById('inactivityDays').selected)
-    {
+    } else if ($('inactivityDays').selected) {
       inactiveTime = inactiveTime*24*60;
       localStorage['inactivityMinutesSelected'] = 'false';
       localStorage['inactivityHoursSelected'] = 'false';
@@ -304,25 +238,20 @@ function saveOptions()
 
     localStorage['inactiveThreshold'] = inactiveTime;
 
-    var closedTime = document.getElementById('closedTime').value;
+    var closedTime = $('closedTime').value;
     localStorage['closedTime'] = closedTime;
 
-    if (document.getElementById('closedMinutes').selected)
-    {
+    if ($('closedMinutes').selected) {
       closedTime = closedTime;
       localStorage['closedMinutesSelected'] = 'true';
       localStorage['closedHoursSelected'] = 'false';
       localStorage['closedDaysSelected'] = 'false';
-    }
-    else if (document.getElementById('closedHours').selected)
-    {
+    } else if ($('closedHours').selected) {
       closedTime = closedTime*60;
       localStorage['closedMinutesSelected'] = 'false';
       localStorage['closedHoursSelected'] = 'true';
       localStorage['closedDaysSelected'] = 'false';
-    }
-    else if (document.getElementById('closedDays').selected)
-    {
+    } else if ($('closedDays').selected) {
       closedTime = closedTime*24*60;
       localStorage['closedMinutesSelected'] = 'false';
       localStorage['closedHoursSelected'] = 'false';
@@ -334,11 +263,10 @@ function saveOptions()
     var backgroundPage = chrome.extension.getBackgroundPage();
     backgroundPage.refreshIntervals();
 
-    var status = document.getElementById('status');
+    var status = $('status');
     status.className = 'noError';
     status.innerHTML = 'Options Saved.';
-    setTimeout(function()
-    {
+    setTimeout(function() {
       status.innerHTML = '';
     }, 750);
   }
@@ -346,7 +274,7 @@ function saveOptions()
 
 function validateForm()
 {
-  var inactiveTime = document.getElementById('inactiveTime').value;
+  var inactiveTime = $('inactiveTime').value;
 
   if (typeof inactiveTime == 'undefined' || inactiveTime == null || inactiveTime.length == 0)
   {
@@ -363,7 +291,7 @@ function validateForm()
     }
   }
 
-  var closedTime = document.getElementById('closedTime').value;
+  var closedTime = $('closedTime').value;
 
   if (typeof closedTime == 'undefined' || closedTime == null || closedTime.length == 0)
   {
@@ -397,110 +325,70 @@ function isDigit(c)
 
 function errorMessage(message)
 {
-  var status = document.getElementById('status');
+  var status = $('status');
   status.className = 'error';
   status.innerHTML = message;
 }
 
-function prepForInput()
-{
-  var url = document.getElementById('whitelisturl').value;
-
-  if (url == 'e.g. www.google.com')
-  {
-    document.getElementById('whitelisturl').value = '';
-  }
-}
-
 function resetErrorMessages()
 {
-  document.getElementById('whitelisturl').className = '';
-  document.getElementById('error').innerHTML = '';
+  $('whitelisturl').className = '';
+  $('error').innerHTML = '';
 }
 
 // Restores select box state to saved value from localStorage.
-function restoreOptions()
-{
+function restoreOptions() {
   var inactiveTime = localStorage['inactiveTime'];
   if (inactiveTime != null)
-  {
-    document.getElementById('inactiveTime').value = inactiveTime;
-  }
+    $('inactiveTime').value = inactiveTime;
   else
-  {
-    document.getElementById('inactiveTime').value = 1;
-  }
+    $('inactiveTime').value = 1;
 
   var inactivityMinutesSelected = localStorage['inactivityMinutesSelected'];
   var inactivityHoursSelected = localStorage['inactivityHoursSelected'];
   var inactivityDaysSelected = localStorage['inactivityDaysSelected'];
 
   if(inactivityMinutesSelected == 'true')
-  {
-    document.getElementById('inactivityMinutes').selected = true;
-  }
+    $('inactivityMinutes').selected = true;
   else if(inactivityHoursSelected == 'true')
-  {
-    document.getElementById('inactivityHours').selected = true;
-  }
+    $('inactivityHours').selected = true;
   else if(inactivityDaysSelected == 'true')
-  {
-    document.getElementById('inactivityDays').selected = true;
-  }
+    $('inactivityDays').selected = true;
   else
-  {
-    document.getElementById('inactivityHours').selected = true;
-  }
+    $('inactivityHours').selected = true;
 
   var closedTime = localStorage['closedTime'];
   if (closedTime != null)
-  {
-    document.getElementById('closedTime').value = closedTime;
-  }
+    $('closedTime').value = closedTime;
   else
-  {
-    document.getElementById('closedTime').value = 1;
-  }
+    $('closedTime').value = 1;
 
   var closedMinutesSelected = localStorage['closedMinutesSelected'];
   var closedHoursSelected = localStorage['closedHoursSelected'];
   var closedDaysSelected = localStorage['closedDaysSelected'];
 
   if(closedMinutesSelected == 'true')
-  {
-    document.getElementById('closedMinutes').selected = true;
-  }
+    $('closedMinutes').selected = true;
   else if(closedHoursSelected == 'true')
-  {
-    document.getElementById('closedHours').selected = true;
-  }
+    $('closedHours').selected = true;
   else if(closedDaysSelected == 'true')
-  {
-    document.getElementById('closedDays').selected = true;
-  }
+    $('closedDays').selected = true;
   else
-  {
-    document.getElementById('closedDays').selected = true;
-  }
+    $('closedDays').selected = true;
 
   displayWhitelistedUrls();
 }
 
-function removeImageMouseOver()
-{
-  this.src = 'images/removeOnHover.png';
-}
-
-function removeImageMouseOut()
-{
-  this.src = 'images/remove.png';
-}
-
 window.onload = function() {
-  $('whitelisturl').onclick = prepForInput;
   $('saveDiv').querySelector('button').onclick = saveOptions;
-  $('whiteListedUrlInputContainer').querySelector('button').onclick =
-      addToWhitelist;
+
+  var addWhitelistButton =
+      $('whiteListedUrlInputContainer').querySelector('button');
+  addWhitelistButton.onclick = addToWhitelist;
+  $('whitelisturl').onkeydown = function(e) {
+    if (e.keyIdentifier == 'Enter')
+      this.parentNode.querySelector('button').click();
+  };
 
   restoreOptions();
 }

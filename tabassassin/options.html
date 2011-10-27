@@ -14,7 +14,7 @@
     <h1>Tab Assassin Options</h1>
 
     <div id="inactiveOptionDiv" class="option">
-      How long should a tab have been inactive before it is closed?<br/>
+      <span>Remove a tab if I haven't used it for </span>
       <input id="inactiveTime" type="text" value="1" size="2"/>
       <select id="inactiveTimeUnits">
         <option id="inactivityMinutes" value="minutes">minutes</option>
@@ -24,7 +24,7 @@
     </div>
 
     <div id="closedOptionDiv" class="option">
-      How long should a tab have been closed before it is removed?<br/>
+      <span>After they have been removed, remember tabs for </span>
       <input id="closedTime" type="text" value="1" size="2" />
       <select id="closedTimeUnits">
         <option id="closedMinutes" value="minutes">minutes</option>
@@ -33,10 +33,10 @@
       </select>
     </div>
 
-    <div id="whitelistOptionDiv" class="option">
-      Are there any websites that should not be closed?<br/>
+    <div id="whitelistOptionDiv" class="option" hidden>
+      Never remove these sites
       <div id="whiteListedUrlInputContainer">
-        <input id="whitelisturl" type="text" value="e.g. www.google.com"
+        <input id="whitelisturl" type="text" placeholder="www.google.com"
             size="20"/>
         <button>Add</button>
       </div>

@@ -24,28 +24,51 @@ h1 {
   margin-bottom: 20px;
 }
 
+#urlWhitelist {
+  display: inline-block;
+  margin-left: 10px;
+  min-width: 200px;
+}
+
+#urlWhitelist > :nth-child(odd) {
+  background-color: #eee;
+}
+
 .whitelistUrlTextboxError {
-  outline-color: #F00;
+  outline-color: red;
 }
 
 .whitelistedUrlContainer {
   font-size: small;
-  height: 25px;
-  width: 50%;
+  padding: 5px;
+  position: relative;
+  width: 100%;
 }
 
-.whitelistedUrlTextLabelContainer {
-  cursor: default;
-  float: left;
-  width: 75%;
+.whitelistedUrlContainer > span {
+  padding-right: 10px;
 }
 
-.removeWhitelistedUrlContainer {
+.whitelistRemove {
+  background-color: transparent;
+  background-image: url('images/close_bar.png');
+  border: none;
   cursor: pointer;
-  float: right;
-  width: 15%;
+  height: 16px;
+  right: 5px;
+  position: absolute;
+  width: 16px;
+}
+
+.whitelistRemove:hover {
+  background-image: url('images/close_bar_h.png');
+}
+
+.whitelistRemove:active {
+  background-image: url('images/close_bar_p.png');
 }
 
 #whiteListedUrlInputContainer {
   margin-bottom: 10px;
+  display: inline-block;
 }

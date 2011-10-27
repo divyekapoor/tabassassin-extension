@@ -20,7 +20,7 @@ function closedTabClicked() {
 }
 
 function minutesText(ticks) {
-  return ticks ? ticks + 'minutes' : '< 1 minute';
+  return ticks ? ticks + ' minutes' : '< 1 minute';
 }
 
 function indexOfTab(tabId, tabs) {
@@ -56,8 +56,8 @@ function populateTabs(tabs) {
 
     openTab.querySelector('.tabTitle').textContent = tabInfo.tab.title;
 
-    var displayText = tabInfo.tab.selected ? '[Active]' :
-        '[Inactive for ' + minutesText(tabInfo.ticks) + ']';
+    var displayText = tabInfo.tab.selected ? 'Active' :
+        'Inactive for ' + minutesText(tabInfo.ticks);
     openTab.querySelector('.tabStatus').textContent = displayText;
     if (tabInfo.tab.selected)
       openTab.classList.add('selected');
@@ -78,7 +78,7 @@ function populateTabs(tabs) {
 
     closedTab.querySelector('.tabTitle').textContent = tabInfo.tab.title;
     closedTab.querySelector('.tabStatus').textContent =
-        '[Removed for ' + minutesText(tabInfo.ticks) + ']';
+        'Removed for ' + minutesText(tabInfo.ticks);
 
     // Reverse the order (most recently closed first).
     closedTabsList.insertBefore(closedTab, lastClosedTab);
