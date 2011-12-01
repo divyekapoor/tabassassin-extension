@@ -72,3 +72,23 @@ h1 {
   margin-bottom: 10px;
   display: inline-block;
 }
+
+#details {
+  color: #888;
+  font-size: small;
+  margin-top: 70px;
+}
+
+#details span {
+  font-weight: bold;
+}
+
+#status.hiddenStatus {
+  opacity: 0;
+  -webkit-transition: opacity .3s;
+  -webkit-transition-delay: .7s;
+}
+
+#status {
+  margin-top: 5px;
+}

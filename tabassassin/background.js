@@ -228,7 +228,8 @@ function initialize() {
   chrome.idle.onStateChanged.addListener(updateIdleState);
 
   setThresholds();
-  updateWhitelistedUrls();
+  // TODO(estade): re-enable?
+  // updateWhitelistedUrls();
   updateTabs();
 }
 

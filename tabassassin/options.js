@@ -35,7 +35,7 @@ function addToWhitelist() {
   } else {
     $('whitelisturl').className = 'whitelistUrlTextboxError';
     $('whitelisturl').focus();
-    $('error').innerHTML = 'Not a valid website address.';
+    $('error').textContent = 'Not a valid website address.';
   }
 
   $('whitelisturl').value = '';
@@ -126,7 +126,7 @@ function addUrlToWhitelist(tabAssassinFolder, url)
     } else {
       $('whitelisturl').className = 'whitelistUrlTextboxError';
       $('whitelisturl').focus();
-      $('error').innerHTML = 'That website address has already been added.';
+      $('error').textContent = 'That website address has already been added.';
     }
   });
 }
@@ -265,10 +265,11 @@ function saveOptions() {
 
     var status = $('status');
     status.className = 'noError';
-    status.innerHTML = 'Options Saved.';
-    setTimeout(function() {
-      status.innerHTML = '';
-    }, 750);
+    status.textContent = 'Options Saved.';
+    status.classList.remove('hiddenStatus');
+    window.setTimeout(function() {
+      status.classList.add('hiddenStatus')
+    }, 0);
   }
 }
 
@@ -311,29 +312,25 @@ function validateForm()
   return true;
 }
 
-function isDigit(c)
-{
-  if (parseInt(c) >= 0 && parseInt(c) <= 9)
-  {
-    return true;
-  }
-  else
-  {
-    return false;
-  }
+function isDigit(c) {
+  return parseInt(c) >= 0 && parseInt(c) <= 9;
 }
 
 function errorMessage(message)
 {
   var status = $('status');
   status.className = 'error';
-  status.innerHTML = message;
+  status.textContent = message;
+  status.classList.remove('hiddenStatus');
+  window.setTimeout(function() {
+    status.classList.add('hiddenStatus')
+  }, 0);
 }
 
 function resetErrorMessages()
 {
   $('whitelisturl').className = '';
-  $('error').innerHTML = '';
+  $('error').textContent = '';
 }
 
 // Restores select box state to saved value from localStorage.
