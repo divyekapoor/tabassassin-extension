@@ -1,12 +1,16 @@
 {
   "name": "Tab Assassin (by Google)",
   "version": "0.1.5",
-  "description": "Manage the number of tabs you have open in Chrome.  Tab Assassin automatically closes, but keeps a record of tabs you are not using.",
+  "description": "Automatically closes unused tabs and allows you to restore them later.",
   "background_page": "background.html",
   "options_page": "options.html",
+  "icons": {
+    "128": "images/ta-icon-128.png"
+  },
   "browser_action": {
-    "default_icon": "images/DelTabsIcon.png",
-    "popup" : "TabAssassin.html"
+    "default_icon": "images/ta-icon.png",
+    "default_title": "Tab Assassin",
+    "default_popup": "TabAssassin.html"
   },
   "permissions": [
     "tabs",
