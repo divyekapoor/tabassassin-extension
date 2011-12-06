@@ -1,6 +1,6 @@
 {
   "name": "Tab Assassin (by Google)",
-  "version": "0.1.5",
+  "version": "1.0",
   "description": "Automatically closes unused tabs and allows you to restore them later.",
   "background_page": "background.html",
   "options_page": "options.html",
