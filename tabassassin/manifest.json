@@ -2,7 +2,7 @@
   "name": "Tab Assassin (by Google)",
   "version": "1.0",
   "manifest_version": 2,
-  "description": "Automatically closes unused tabs and allows you to restore them later.",
+  "description": "Achieve tabstrip zen",
   "background_page": "background.html",
   "options_page": "options.html",
   "icons": {

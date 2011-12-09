@@ -1,3 +1,1 @@
-Achieve tabstrip zen
-
 Tab Assassin allows you to set a shelf life on your tabs. Don't use a tab for long enough, and Tab Assassin will silently and ruthlessly remove it. Not to fear, restoring that closed tab is just a couple of clicks away.
