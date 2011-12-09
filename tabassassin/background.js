@@ -122,7 +122,7 @@ function getBookmarkFolder(bookmarks, folderName) {
 // Inactive tabs are closed, removed from an array of open tabs and added to
 // an array of closed tabs.
 function updateTabs() {
-  setTimeout('updateTabs()', updateTabsInterval);
+  setTimeout(updateTabs, updateTabsInterval);
 
   if (chromeIdle)
     return;
