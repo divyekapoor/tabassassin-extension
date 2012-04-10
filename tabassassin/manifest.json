@@ -1,9 +1,11 @@
 {
   "name": "Tab Assassin (by Google)",
-  "version": "1.0",
+  "version": "1.0.0.1",
   "manifest_version": 2,
   "description": "Achieve tabstrip zen",
-  "background_page": "background.html",
+  "background": {
+    "page": "background.html"
+  },
   "options_page": "options.html",
   "icons": {
     "128": "images/ta-icon-128.png"
@@ -15,7 +17,7 @@
   },
   "permissions": [
     "tabs",
-    "background",
+    "background_page",
     "idle"
   ]
 }
