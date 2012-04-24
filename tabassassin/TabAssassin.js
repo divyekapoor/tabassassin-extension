@@ -56,10 +56,13 @@ function populateTabs(tabs) {
     var openTab = tabEntryTemplate.cloneNode(true);
     openTab.id = tabInfo.tab.id;
     openTab.onclick = openTabClicked;
+    openTab.style.backgroundImage =
+        'url(chrome://favicon/' + tabInfo.tab.url + ')';
 
     openTab.querySelector('.tabTitle').textContent = tabInfo.tab.title;
 
     var displayText = tabInfo.tab.selected ? 'In use' :
+        tabInfo.tab.pinned ? 'Pinned' :
         'Last used ' + minutesText(tabInfo.ticks);
     openTab.querySelector('.tabStatus').textContent = displayText;
     if (tabInfo.tab.selected)
@@ -78,6 +81,8 @@ function populateTabs(tabs) {
     var closedTab = tabEntryTemplate.cloneNode(true);
     closedTab.id = tabInfo.tab.id;
     closedTab.onclick = closedTabClicked;
+    closedTab.style.backgroundImage =
+        'url(chrome://favicon/' + tabInfo.tab.url + ')';
 
     closedTab.querySelector('.tabTitle').textContent = tabInfo.tab.title;
     closedTab.querySelector('.tabStatus').textContent =

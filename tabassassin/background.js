@@ -143,6 +143,9 @@ function updateTabs() {
 
     if (!tabInfo.tab.selected)
       tabInfo.ticks++;
+
+    if (tabInfo.tab.pinned)
+      tabInfo.ticks = 0;
   });
 
   closedTabs = closedTabs.filter(function(tabInfo) {

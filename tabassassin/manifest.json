@@ -16,8 +16,8 @@
     "default_popup": "TabAssassin.html"
   },
   "permissions": [
+    "chrome://favicon/",
     "tabs",
-    "background_page",
     "idle"
   ]
 }
