@@ -76,12 +76,12 @@ chrome.tabs.onUpdated.addListener(function(tabId, changeInfo, tab) {
   tabInfo.tab = tab;
 });
 
-chrome.tabs.onSelectionChanged.addListener(function(tabId, selectInfo) {
+chrome.tabs.onActivated.addListener(function(activeInfo) {
   openTabs.forEach(function(tabInfo) {
-    if (tabInfo.tab.id == tabId) {
+    if (tabInfo.tab.id == activeInfo.tabId) {
       tabInfo.ticks = 0;
       tabInfo.tab.selected = true;
-    } else if (selectInfo.windowId == tabInfo.tab.windowId) {
+    } else if (activeInfo.windowId == tabInfo.tab.windowId) {
       tabInfo.tab.selected = false;
     }
   });
@@ -104,6 +104,13 @@ chrome.tabs.onDetached.addListener(function(tabId, detachInfo) {
   var tabInfo = getTabById(openTabs, tabId);
   tabInfo.detached = true;
 });
+
+// API error handler.
+function apiErrorHandler() {
+  if (chrome.runtime.lastError) {
+    console.log(chrome.runtime.lastError.message);
+  }
+}
 
 function getBookmarkFolder(bookmarks, folderName) {
   var bookmarkFolder;
@@ -138,7 +145,7 @@ function updateTabs() {
         !isWhitelisted(tabInfo.tab.url) &&
         !tabInfo.detached) {
       closedTabs.push(new TabInfo(tabInfo.tab));
-      chrome.tabs.remove(tabInfo.tab.id);
+      chrome.tabs.remove(tabInfo.tab.id, apiErrorHandler);
     }
 
     if (!tabInfo.tab.selected)
@@ -158,7 +165,7 @@ function updateTabs() {
 
 // Focuses an open tab selected from the bubble UI.
 function selectTab(tabId) {
-  chrome.tabs.update(tabId, {selected : true});
+  chrome.tabs.update(tabId, {selected : true}, apiErrorHandler);
 }
 
 // Reopens an assassinated tab selected from the Tab Assassin UI
