@@ -1,11 +1,9 @@
 Tab Assassin (By Google)
 ========================
 
-This extension manages your tabs for you in Google Chrome.
-
-Idle tabs are automatically closed after 1 hour. Your tabs will not be closed
-if the Chrome session is idle. Recently closed tabs can be reopened from a menu.
-The expiry duration is (of-course) configurable.
+Tab Assassin allows you to set a shelf life on your tabs. Don't use a tab for
+long enough, and Tab Assassin will silently and ruthlessly remove it. Not to
+fear, restoring that closed tab is just a couple of clicks away.
 
 This is a solid, reliable extension that doesn't get in your way.
 Here are a few screenshots to show you how it looks:
