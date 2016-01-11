@@ -36,7 +36,7 @@ function indexOfTab(tabId, tabs) {
 }
 
 function populateTabsForWindow(windowInfo) {
-  chrome.tabs.getAllInWindow(windowInfo.id, populateTabs);
+  populateTabs(windowInfo.tabs);
 }
 
 // Displays the opened and closed tabs to the user. |tabs| is the list of
@@ -107,5 +107,5 @@ function removeTab(tabId) {
 }
 
 window.onload = function() {
-  chrome.windows.getCurrent(populateTabsForWindow);
+  chrome.windows.getCurrent({ populate: true }, populateTabsForWindow);
 }
