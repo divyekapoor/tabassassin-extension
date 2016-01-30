@@ -142,6 +142,8 @@ function updateWhitelistedUrls() {
         });
     }
   });
+
+  backgroundPage.whitelistedUrls.push('chrome://newtab/');
 }
 
 function displayWhitelistedUrl(url) {
@@ -205,7 +207,7 @@ function removeWhitelistedUrl() {
 }
 
 function isUrl(url) {
-  var pattern = '^(http:\/\/www.|https:\/\/www.|www.){1}([0-9A-Za-z]+\.)';
+  var pattern = '^(http:\/\/www.|https:\/\/www.|chrome:\/\/|www.){1}([0-9A-Za-z]+\.)';
 
   if (url.match(pattern))
     return true;
