@@ -1,7 +1,6 @@
-all: zipfile
+all: tabassassin.zip
 
-
-zipfile: clean
+tabassassin.zip: clean
 	zip -r tabassassin.zip tabassassin/
 	zip -d tabassassin.zip tabassassin/promotional/
 
